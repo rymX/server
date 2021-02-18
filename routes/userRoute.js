@@ -6,7 +6,6 @@ const jwt = require('jsonwebtoken');
 const userRoute = express.Router();
 
 // get all the users 
-
 userRoute.get('/all', (req, res) => {
 User.find() 
 .exec()
@@ -21,27 +20,29 @@ User.find()
 
 // get a specific user 
 
-userRoute.get('/login', (req, res) => {
-    User.find({username : req.body.username})
+userRoute.get('/login/username/:username/password/:password', (req, res) => {
+    console.log(req.params)
+    User.find({username : req.params.username})
     .select("_id username password")
     .then(rows =>{
         if (rows.length < 1){
-            return res.status(401).json({message : "auth faild"})
+            return res.status(401).json({message : "wrong username "})
         }
-        bcrypt.compare(req.body.password , rows[0].password , (err, response)=>{
+        bcrypt.compare(req.params.password , rows[0].password , (err, response)=>{
                 if (response){
                  const token =   jwt.sign({
                         username : rows[0].username,
                         id : rows[0]._id
-                    } , process.env.JWT_KEY,
-                    {
-                        expiresIn : "1h"
-                    });
-                    res.cookie('jwt' , token , {httpOnly : true ,maxAge:1000*60*60*3});
-                    res.status(200).json({ user : rows[0]._id })
+                    } , 
+                    process.env.JWT_KEY,
+                    );
+                    //res.setHeader('Set-Cookie', {'jwt':token})
+                    res.cookie('jwt' , token);
+                    res.status(200).json({ user : rows[0]._id });
+                    
                 }
                 else {
-                    return res.status(401).json({messgae : "Auth failed "});
+                    return res.status(401).json({messgae : "wrong password"});
                 }
             } );
     })
@@ -53,7 +54,6 @@ userRoute.get('/login', (req, res) => {
 
 });
 // post a user 
-
 userRoute.post('/signup', (req, res) => {
     User.find({ username: req.body.username })
         .exec()
@@ -95,6 +95,4 @@ userRoute.get('/logout', (req,res)=>{
     res.cookie('jwt', '', {maxAge : 1});
     res.json('good by');
 })
-
-
 module.exports= userRoute ;

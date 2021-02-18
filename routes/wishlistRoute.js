@@ -19,8 +19,9 @@ wishlistRoute.get('/all', (req, res) => {
 // get all 
 wishlistRoute.get('/user/:userid', (req, res) => {
     Wishlist.find({ owner: req.params.userid })
+    .select("wishlistname")
         .exec().then(result => {
-            return res.status(200).json(result)
+            return res.status(200).send(result)
         }).catch(error => {
             return res.status(500).json(error)
         })

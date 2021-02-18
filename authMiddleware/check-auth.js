@@ -1,9 +1,17 @@
 const jwt = require ('jsonwebtoken');
+const { get } = require('mongoose');
 
 const requireAuth = (req, res , next)=>{
     try{
-        console.log(req.headers.Cookie)
-       const token = req.headers.authorization.split(" ")[1] ;
+        const cookies = req.headers.cookie ; 
+        const getToken = ( cookies ) => {
+            return cookies.split('; ').reduce((r, v) => {
+              const parts = v.split('=')
+              return parts[0] === 'jwt' ? decodeURIComponent(parts[1]) : r
+            }, '') 
+          };
+      const token = getToken( cookies);
+       
    // const token = req.Cookies.jwt ; 
         const decoded = jwt.verify(token ,process.env.JWT_KEY);
        req.userDate = decoded ; 

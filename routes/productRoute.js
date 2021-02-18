@@ -9,13 +9,27 @@ const productRoute = express.Router();
 
 const storage = multer.diskStorage({
    destination : function(req, file , cb){
-      cb(null , './uploads');
+      cb(null , './uploads/');
    },
    filename : function(req,file,cb){
       cb(null , file.originalname);
    }
 })
-const upload = multer({storage : storage});
+const fileFilter = (req, file , cb)=>{
+    if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg' ){
+        cb(null , true)
+    }
+    else {
+        cb(null , false)
+    }
+   
+    
+}
+const upload = multer({
+    storage : storage,
+    limits :{ fileSize: 1024 *1024 *5},
+     fileFilter : fileFilter
+});
 
 // get all products
 productRoute.get('/all', (req, res) => {
@@ -56,7 +70,7 @@ productRoute.post('/', upload.single('productimg') , (req, res) => {
                     description: req.body.description,
                     wishlistid : req.bodywishlistid,
                     status: req.body.status,
-                    imageurl: req.body.imageurl,
+                    imageurl: req.file.path,
                     owner: req.body.owner
                 });
                 // have to update wishlist's products array
