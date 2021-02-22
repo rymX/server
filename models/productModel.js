@@ -7,6 +7,7 @@ const productSchema = mongoose.Schema({
     productprice : Number ,
     currency : String ,
     description : String ,
+    wishlistname : String ,
     wishlistid: {
         type :  mongoose.Schema.Types.ObjectId ,
        ref : "Wishlist"

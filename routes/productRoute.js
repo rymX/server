@@ -43,19 +43,29 @@ productRoute.get('/all', (req, res) => {
             return res.status(500).json({ error: error })
         })
 })
-// get all product of spesific user 
-// and specific wishlist 
-productRoute.get('/user/:userid/wishlist/:wishlistid', (req, res) => {
-    Product.find({ owner: req.params.userid })
+
+// get all product of specific wishlist 
+productRoute.get('/wishlist/:wishlistid', (req, res) => {
+    Product.find({ wishlistid: req.params.wishlistid })
         .exec().then(result => {
             return res.status(200).json(result)
         }).catch(error => {
             return res.status(500).json(error)
         })
 })
+// get all product of spesific user 
+productRoute.get('/userid/:userid', (req, res) => {
+    Product.find({ owner : req.params.userid })
+        .exec().then(result => {
+            return res.status(200).json(result)
+        }).catch(error => {
+            return res.status(500).json(error)
+        })
+});
 // post a product 
 productRoute.post('/', upload.single('productimg') , (req, res) => {
     console.log(req.file);
+    console.length(req.body);
     Product.find({ productname: req.body.productname })
         .exec()
         .then(rows => {
@@ -68,9 +78,10 @@ productRoute.post('/', upload.single('productimg') , (req, res) => {
                     productprice: req.body.productprice,
                     currency: req.body.currency,
                     description: req.body.description,
-                    wishlistid : req.bodywishlistid,
+                    wishlistname : req.body.wishlistname,
+                    wishlistid : req.body.wishlistid,
                     status: req.body.status,
-                    imageurl: req.file.path,
+                    imageurl: "http://localhost:4000/"+req.file.path,
                     owner: req.body.owner
                 });
                 // have to update wishlist's products array
@@ -116,8 +127,8 @@ productRoute.patch('/', checkAuth, (req, res) => {
         })
 })
 // delete product
-productRoute.delete('/', checkAuth, (req, res) => {
-    Product.remove({ productname: req.body.productname })
+productRoute.delete('/id/:id', (req, res) => {
+    Product.remove({ _id: req.params.id })
         .exec()
         .then(result => {
             // have to update wishlist's products array
