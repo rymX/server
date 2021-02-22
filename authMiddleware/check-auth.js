@@ -11,10 +11,7 @@ const requireAuth = (req, res , next)=>{
             }, '') 
           };
       const token = getToken( cookies);
-       
-   // const token = req.Cookies.jwt ; 
         const decoded = jwt.verify(token ,process.env.JWT_KEY);
-       req.userDate = decoded ; 
         next();
     }
     catch(error){ 

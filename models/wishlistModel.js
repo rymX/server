@@ -4,12 +4,6 @@ const Product = require('./productModel')
 
 const wishlistSchema = mongoose.Schema({
     wishlistname : String ,
-    products : [
-        {
-            type :  mongoose.Schema.Types.ObjectId ,
-           ref : "Product"
-        }
-    ], 
     owner:{
         type :  mongoose.Schema.Types.ObjectId ,
        ref : "User"

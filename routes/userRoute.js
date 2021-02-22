@@ -5,19 +5,6 @@ const jwt = require("jsonwebtoken");
 
 const userRoute = express.Router();
 
-// get all the users
-userRoute.get("/all", (req, res) => {
-  User.find()
-    .exec()
-    .then((rows) => {
-      return res.status(200).json({ rows });
-    })
-    .catch((error) => {
-      console.log(error);
-      return res.status(500).json({ error: error });
-    });
-});
-
 // get a specific user
 
 userRoute.get("/login/username/:username/password/:password", (req, res) => {
@@ -25,7 +12,7 @@ userRoute.get("/login/username/:username/password/:password", (req, res) => {
     .select("_id username password")
     .then((rows) => {
       if (rows.length < 1) {
-        return res.status(401).json({ message: "wrong username " });
+        return res.status(401).json({ message: "auth failed"});
       }
       bcrypt.compare(req.params.password, rows[0].password, (err, response) => {
         if (response) {
@@ -42,7 +29,7 @@ userRoute.get("/login/username/:username/password/:password", (req, res) => {
           
           res.status(200).json({ user: rows[0]._id });
         } else {
-          return res.status(401).json({ messgae: "wrong password" });
+          return res.status(401).json({ messgae: "auth failed" });
         }
       });
     })
@@ -87,22 +74,9 @@ userRoute.post("/signup", (req, res) => {
       return res.status(500).json({ messageerror: error });
     });
 });
-// userRoute.get("/get-cookie", (req, res) => {
-//   const getUser = (cookies) => {
-//     return cookies.split("; ").reduce((r, v) => {
-//       const parts = v.split("=");
-//       return parts[0] === "newUser" ? decodeURIComponent(parts[1]) : r;
-//     }, "");
-//   };
-//   const cookies = req.headers.cookie;
-//   console.log(cookies);
-//   res.json(cookies);
-//   // const actualUser = getUser(cookies);
-//   // res.json(actualUser);
-// });
 userRoute.get("/logout", (req, res) => {
   res.cookie("jwt", "", { maxAge: 1 , withCredentials: true});
   res.cookie("newuser", "",{ maxAge: 1 , withCredentials: true });
-  res.json("good by");
+  res.status(200).json({message : "logged out"});
 });
 module.exports = userRoute;
